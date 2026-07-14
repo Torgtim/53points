@@ -27,7 +27,7 @@
 </head>
 <body>
 
-    <div id="ui">Poeng: <span id="score">0</span> / 53</div>
+    <div id="ui">Poeng: <span id="score">0</span></div>
     <canvas id="gameCanvas" width="400" height="500"></canvas>
 
     <script>
@@ -36,6 +36,7 @@
         const scoreDisplay = document.getElementById("score");
 
         let score = 0;
+        const baseSpeed = 4;
         
         // Kurv (spiller)
         const basket = {
@@ -51,7 +52,7 @@
             x: Math.random() * (canvas.width - 20) + 10,
             y: 0,
             radius: 10,
-            speed: 4,
+            speed: baseSpeed,
             color: "#ff4757"
         };
 
@@ -60,7 +61,6 @@
             const rect = canvas.getBoundingClientRect();
             basket.x = e.clientX - rect.left - basket.width / 2;
             
-            // Hold kurven innenfor skjermen
             if (basket.x < 0) basket.x = 0;
             if (basket.x > canvas.width - basket.width) basket.x = canvas.width - basket.width;
         });
@@ -74,12 +74,12 @@
         });
 
         function update() {
-            // Flytt ballen nedover
             ball.y += ball.speed;
 
-            // Sjekk om ballen treffer bunnen (bom)
-            if (ball.y > canvas.height) {
-                resetBall();
+            // Sjekk om ballen går ut av skjermen i bunnen (spilleren dør)
+            if (ball.y - ball.radius > canvas.height) {
+                gameOver();
+                return;
             }
 
             // Sjekk kollisjon med kurven
@@ -110,8 +110,16 @@
             ball.x = Math.random() * (canvas.width - 20) + 10;
         }
 
+        function gameOver() {
+            alert("Du tapte! Prøv igjen.");
+            score = 0;
+            scoreDisplay.textContent = score;
+            ball.speed = baseSpeed;
+            resetBall();
+            requestAnimationFrame(update);
+        }
+
         function draw() {
-            // Tøm canvas
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // Tegn kurv
